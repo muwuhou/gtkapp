@@ -1,6 +1,13 @@
 #include <gtk/gtk.h>
 #include <glib/gprintf.h>
 
+
+const char* my_pango_text = " \
+<big> \
+Hello <b>there</b>, the <span foreground=\"blue\" size=\"x-large\">Pango text</span> is really <i>cool</i>, do you <u>agree</u>? \
+</big> \
+";
+
 static void
 print_hello (GtkWidget *widget, gpointer data)
 {
@@ -17,6 +24,9 @@ GtkWidget* create_top_right()
   gtk_box_append(GTK_BOX(topRightBox), button1);
   gtk_box_append(GTK_BOX(topRightBox), button2);
   gtk_box_append(GTK_BOX(topRightBox), button3);
+  gtk_widget_set_margin_end(topRightBox, 10);
+  gtk_widget_set_margin_top(topRightBox, 10);
+  gtk_widget_set_margin_bottom(topRightBox, 10);
   return topRightBox;
 }
 
@@ -30,11 +40,13 @@ GtkWidget* create_top()
   buffer = gtk_text_buffer_new(NULL);
   gtk_text_buffer_set_text(buffer, "hello world!", -1);
   gtk_text_view_set_buffer(GTK_TEXT_VIEW(textView), buffer);
-  gtk_widget_set_size_request(textView, 100, 100);
-  gtk_widget_set_margin_start(textView, 4);
-  gtk_widget_set_margin_end(textView, 4);
-  gtk_widget_set_margin_top(textView, 4);
-  gtk_widget_set_margin_bottom(textView, 4);
+
+  gtk_widget_set_size_request(textView, 100, 200);
+  gtk_widget_set_margin_start(textView, 10);
+  gtk_widget_set_margin_end(textView, 10);
+  gtk_widget_set_margin_top(textView, 10);
+  gtk_widget_set_margin_bottom(textView, 10);
+  gtk_widget_set_hexpand(textView, true);
 
 
   topRightBox = create_top_right();
@@ -43,17 +55,38 @@ GtkWidget* create_top()
   return topBox;
 }
 
+GtkWidget* create_middle()
+{
+  GtkWidget* label;
+
+  label = gtk_label_new(NULL);
+  gtk_label_set_markup(GTK_LABEL(label), my_pango_text);
+  gtk_widget_set_halign(label, GTK_ALIGN_CENTER);
+  gtk_widget_set_vexpand(label, true);
+  return label;
+}
+
 GtkWidget* create_bottom_bar()
 {
   GtkWidget* bottomBox, *button1, *button2;
 
-  bottomBox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 1);
+  bottomBox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 5);
   button1 = gtk_button_new_with_label("Hello");
+  gtk_widget_set_margin_start(button1, 5);
+  gtk_widget_set_margin_bottom(button1, 5);
   g_signal_connect(button1, "clicked", G_CALLBACK (print_hello), "hello!");
+
   button2 = gtk_button_new_with_label("Go!");
+  gtk_widget_set_margin_start(button2, 5);
+  gtk_widget_set_margin_bottom(button2, 5);
+  gtk_widget_set_margin_end(button2, 5);
   g_signal_connect(button2, "clicked", G_CALLBACK (print_hello), "Go!");
+
   gtk_box_append(GTK_BOX(bottomBox), button1);
   gtk_box_append(GTK_BOX(bottomBox), button2);
+
+  gtk_widget_set_halign(bottomBox, GTK_ALIGN_END);
+  gtk_widget_set_valign(bottomBox, GTK_ALIGN_END);
   return bottomBox;
 }
 
@@ -70,8 +103,10 @@ activate (GtkApplication *app,
 
   box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 1);
   gtk_box_append(GTK_BOX(box), create_top());
+  gtk_box_append(GTK_BOX(box), create_middle());
   gtk_box_append(GTK_BOX(box), create_bottom_bar());
   gtk_window_set_child(GTK_WINDOW(window), box);
+  gtk_widget_set_size_request(window, 500, 400);
 
   gtk_window_present(GTK_WINDOW(window));
 }
